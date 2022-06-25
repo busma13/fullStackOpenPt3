@@ -56,13 +56,24 @@ app.delete('/api/persons/:id', (request, response) => {
 
 app.post('/api/persons', (request, response) => {
   let body = request.body
-  persons.push({
-    id: Math.ceil(Math.random() * 100000000),
-    name: body.name,
-    number: body.number
-  })
+  if (!body.name || !body.number) {
+    response.status(400).json({
+      error: 'name or number missing'
+    })
+  } else if (persons.some(entry => entry.name === body.name)) {
+    response.status(400).json({
+      error: 'Name already exists in phonebook'
+    })
+  } else {
+    persons.push({
+      id: Math.ceil(Math.random() * 100000000),
+      name: body.name,
+      number: body.number
+    })
+  
+    response.json(persons)
+  }
 
-  response.json(persons)
 })
 
 const PORT = 3001
